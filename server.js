@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const sql = require('mssql');
 require('dotenv').config();
 
 // Routes
@@ -29,6 +30,48 @@ app.use('/auth', authRoutes); // Các route liên quan đến auth (login/signup
 // Route mẫu cho private route cần xác thực
 app.get('/protected', authenticate, (req, res) => {
     res.status(200).json({ message: `Welcome, ${req.user.username}!` });
+});
+
+const sqlConfig = {
+    user: process.env.EHR_DB_USER,
+    password: process.env.EHR_DB_PASSWORD,
+    server: process.env.EHR_DB_SERVER, // e.g., localhost
+    database: process.env.EHR_DB_DATABASE,
+    options: {
+        encrypt: false, // Set to true if using Azure SQL or require encryption
+        trustServerCertificate: true, // True for local dev/test; adjust for production
+    },
+};
+
+// Connect to SQL Server
+sql.connect(sqlConfig).then(() => {
+    console.log("Connected to SQL Server");
+}).catch(err => {
+    console.error("Database connection failed:", err);
+});
+
+// Route to query all rows from a specified table
+app.get('/tables/:tableName', async (req, res) => {
+    const { tableName } = req.params;
+
+    try {
+        const request = new sql.Request();
+        const query = `SELECT * FROM ${tableName};`; // Basic query
+        const result = await request.query(query);
+
+        res.status(200).json({
+            success: true,
+            table: tableName,
+            data: result.recordset, // Contains the rows
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Error querying the database. Check table name or database configuration.",
+            error: error.message,
+        });
+    }
 });
 
 // Middleware xử lý lỗi (phải đặt cuối cùng)
