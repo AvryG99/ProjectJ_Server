@@ -5,6 +5,7 @@ require('dotenv').config();
 
 // Routes
 const authRoutes = require('./routes/authRoutes');
+const setupSwagger = require("./config/swagger"); // Import Swagger config
 
 // Middleware
 const authenticate = require('./middlewares/authenticate');
@@ -16,6 +17,9 @@ const app = express();
 // Middleware cơ bản
 app.use(cors());
 app.use(bodyParser.json());
+
+// Đăng ký Swagger
+setupSwagger(app); // Kích hoạt Swagger
 
 // Logging request (nếu cần kiểm tra)
 app.use((req, res, next) => {
