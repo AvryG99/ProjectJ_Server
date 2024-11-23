@@ -3,9 +3,11 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 const sql = require('mssql');
+
 // Routes
 const authRoutes = require('./routes/authRoutes');
 const tableRoutes = require('./routes/tableRoutes');
+const setupSwagger = require("./config/swagger"); // Import Swagger config
 
 // Middleware
 const authenticate = require('./middlewares/authenticate');
@@ -17,6 +19,9 @@ const app = express();
 // Middleware cơ bản
 app.use(cors());
 app.use(bodyParser.json());
+
+// Đăng ký Swagger
+setupSwagger(app); // Kích hoạt Swagger
 
 // Logging request (nếu cần kiểm tra)
 app.use((req, res, next) => {
