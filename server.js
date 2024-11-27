@@ -3,9 +3,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const sql = require('mssql');
 require('dotenv').config();
-
+const sql = require('mssql');
 // Routes
 const authRoutes = require('./routes/authRoutes');
+const tableRoutes = require('./routes/tableRoutes');
 
 // Middleware
 const authenticate = require('./middlewares/authenticate');
@@ -26,6 +27,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/auth', authRoutes); // Các route liên quan đến auth (login/signup)
+app.use('/table', tableRoutes); // Các route liên quan đến table
 
 // Route mẫu cho private route cần xác thực
 app.get('/protected', authenticate, (req, res) => {
