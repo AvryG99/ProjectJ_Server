@@ -7,6 +7,9 @@ require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const tableRoutes = require('./routes/tableRoutes');
 
+// Import Swagger setup function
+const setupSwagger = require('./config/swagger');  // Đảm bảo bạn import đúng đường dẫn
+
 // Middleware
 const authenticate = require('./middlewares/authenticate');
 const errorHandler = require('./middlewares/errorHandler');
@@ -28,11 +31,13 @@ app.use((req, res, next) => {
 app.use('/node/auth', authRoutes); // Updated route for auth
 app.use('/node/table', tableRoutes); // Updated route for table
 
+// Setup Swagger documentation for the API
+setupSwagger(app);  // Tích hợp Swagger vào ứng dụng Express
+
 // Route mẫu cho private route cần xác thực
 app.get('/node/protected', authenticate, (req, res) => {
     res.status(200).json({ message: `Welcome, ${req.user.username}!` });
 });
-
 
 const sqlConfig = {
     user: process.env.EHR_DB_USER,
