@@ -3,7 +3,6 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const sql = require('mssql');
 require('dotenv').config();
-const sql = require('mssql');
 // Routes
 const authRoutes = require('./routes/authRoutes');
 const tableRoutes = require('./routes/tableRoutes');
@@ -26,13 +25,14 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use('/auth', authRoutes); // Các route liên quan đến auth (login/signup)
-app.use('/table', tableRoutes); // Các route liên quan đến table
+app.use('/node/auth', authRoutes); // Updated route for auth
+app.use('/node/table', tableRoutes); // Updated route for table
 
 // Route mẫu cho private route cần xác thực
-app.get('/protected', authenticate, (req, res) => {
+app.get('/node/protected', authenticate, (req, res) => {
     res.status(200).json({ message: `Welcome, ${req.user.username}!` });
 });
+
 
 const sqlConfig = {
     user: process.env.EHR_DB_USER,
@@ -40,7 +40,7 @@ const sqlConfig = {
     server: process.env.EHR_DB_SERVER, // e.g., localhost
     database: process.env.EHR_DB_DATABASE,
     options: {
-        encrypt: false, // Set to true if using Azure SQL or require encryption
+        encrypt: true, // Set to true if using Azure SQL or require encryption
         trustServerCertificate: true, // True for local dev/test; adjust for production
     },
 };
@@ -53,7 +53,7 @@ sql.connect(sqlConfig).then(() => {
 });
 
 // Route to query all rows from a specified table
-app.get('/tables/:tableName', async (req, res) => {
+app.get('/node/tables/:tableName', async (req, res) => {
     const { tableName } = req.params;
 
     try {
@@ -81,6 +81,6 @@ app.use(errorHandler);
 
 // Khởi động server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0',() => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
